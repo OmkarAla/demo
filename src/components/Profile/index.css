@@ -1,0 +1,48 @@
+/* ProfilePage.css */
+.profile-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.profile-section {
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.user-features,
+.admin-features,
+.moderator-features {
+  margin-top: 20px;
+}
+
+button {
+  padding: 8px 16px;
+  margin: 0 10px 10px 0;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+.loading {
+  text-align: center;
+  padding: 50px;
+}
+
+.not-logged-in {
+  text-align: center;
+  padding: 50px;
+}
+
+.common-actions {
+  text-align: center;
+  margin-top: 20px;
+}

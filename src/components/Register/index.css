@@ -1,0 +1,92 @@
+.reg-main{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+}
+
+.reg-card{
+    min-height: 600px;
+    width: 700px;
+    box-shadow: 1px 0.5px 10px black;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.reg-head{
+    color: #333;
+    font-family: "Roboto";
+}
+
+.form-reg{
+    display: flex;
+    flex-direction: column;
+    min-height: 170px;
+    justify-content: space-between;
+}
+
+.lab-reg{
+    color: #302f2f;
+}
+
+.input-reg{
+    overflow: none;
+    outline: none;
+    border: 1px solid #a5a5a5;
+    border-radius: 4px;
+    width: 250px;
+    height: 30px;
+    padding-left: 5px;
+}
+
+.hide-reg{
+    border: 1px solid #a5a5a5;
+    border-radius: 4px;
+    width: 250px;
+    display: flex;
+    flex-direction: row;
+    justify-content: none;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.input-reg2{
+    width: 220px;
+    height: 30px;
+    border: none;
+    outline: none;
+}
+
+.icon-reg{
+    border: none;
+    background-color: transparent;
+    outline: none;
+    height: 30px;
+    width: 30px;
+}
+
+.input-reg::placeholder{
+    color: #a5a5a5;
+}
+.input-reg2::placeholder{
+    color: #a5a5a5;
+}
+
+.bnt-reg{
+    width: auto;
+    height: 40px;
+    margin-top: 10px;
+}
+
+.error{
+    color: red;
+}
+
+.log-para{
+    margin-top: 10px;
+}
