@@ -1,6 +1,13 @@
 .admin-dashboard {
   padding: 20px;
-  background-color: #f8f9fa;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  margin-top: 80px;
+  justify-content: center;
+  align-self: center;
+  width: 60%;
 }
 
 .dashboard-section {
@@ -10,11 +17,22 @@
   border-radius: 5px;
   background-color: #ffffff;
 }
-
+.new-admin{
+  width: 60%;
+}
 h1 {
   color: #343a40;
 }
 
 h2 {
   color: #495057;
+}
+
+.approve-card{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 70px;
+  width: 400px;
+  margin: 20px;
 }

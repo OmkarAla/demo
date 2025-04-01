@@ -2,7 +2,6 @@ import { CiLogin, CiLogout } from "react-icons/ci";
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { FaRegUser } from "react-icons/fa";
 import "./index.css";
 
 const Navbar = () => {
@@ -37,7 +36,7 @@ const Navbar = () => {
   };
 
   const handleProfileClick = () => {
-    navigate(user?.role === "admin" ? "/admin" : user?.role === "faculty" ? "/faculty-dashboard" : "/profile");
+    navigate(user?.role === "admin" ? "/admin" : user?.role === "faculty" ? "/faculty" : "/profile");
   };
 
   return (
@@ -50,7 +49,6 @@ const Navbar = () => {
           className="nav-logo"
         />
       </Link>
-
       {/* Navbar Links */}
       <ul className="nav-list">
         {user ? (
@@ -65,14 +63,13 @@ const Navbar = () => {
 
             {/* Faculty Links */}
             {user.role === "faculty" && (
-              <Link to="/faculty-dashboard" className="nav-item">Faculty Dashboard</Link>
+              <Link to="/faculty" className="nav-item">Dashboard</Link>
             )}
 
             {/* Admin Links */}
             {user.role === "admin" && (
               <>
-                <Link to="/admin-dashboard" className="nav-item">Admin Dashboard</Link>
-                <Link to="/manage" className="nav-item">Manage</Link>
+                <Link to="/admin" className="nav-item">Dashboard</Link>
               </>
             )}
             
@@ -84,6 +81,7 @@ const Navbar = () => {
             {/* Guest Links */}
             <Link to="/courses" className="nav-item">Courses</Link>
             <Link to="/faqs" className="nav-item">FAQs</Link>
+            <Link to="/selection" className="nav-item">Choose Your Elective</Link>
           </>
         )}
       </ul>
@@ -91,9 +89,6 @@ const Navbar = () => {
       {/* Profile & Logout/Login Buttons */}
       {user ? (
         <div className="nav-actions d-flex gap-3">
-          <button onClick={handleProfileClick} className="button">
-            <FaRegUser className="nav-icon" /> {user.name || "Profile"}
-          </button>
           <button onClick={handleLogout} className="button">
             Logout <CiLogout className="nav-icon" />
           </button>

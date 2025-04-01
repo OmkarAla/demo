@@ -1,109 +1,138 @@
-import React, { useState, useEffect } from 'react';
-import { auth, db } from '../../firebase';
-import { doc, getDoc } from 'firebase/firestore';
-import { onAuthStateChanged } from 'firebase/auth';
-import './index.css';
+import React, { useState, useEffect } from "react";
+import Navbar from "../Navbar"; // Import Navbar
+import Cookies from "js-cookie";
+import "./index.css";
 
 const ProfilePage = () => {
   const [userData, setUserData] = useState(null);
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [formData, setFormData] = useState({});
+
+  const name = Cookies.get("name");
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        try {
-          const userDocRef = doc(db, 'users', currentUser.uid);
-          const userDoc = await getDoc(userDocRef);
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/user?name=${name}`);
+        if (!response.ok) throw new Error("Failed to fetch user data.");
 
-          if (userDoc.exists()) {
-            const data = userDoc.data();
-            setUserData(data);
-            setRole(data.role);
-          } else {
-            setError('User profile not found.');
-          }
-        } catch (err) {
-          setError('Failed to fetch user data. Please try again later.');
-          console.error('Firestore Error:', err);
-        }
-      } else {
-        setError('User not logged in');
+        const data = await response.json();
+        setUserData(data);
+        setRole(data.role);
+        setFormData(data); // Initialize form data for editing
+      } catch (err) {
+        setError(err.message);
       }
       setLoading(false);
-    });
+    };
 
-    return () => unsubscribe();
+    fetchUserData();
   }, []);
 
-  // 🔹 Student Profile Component
-  const StudentProfile = ({ data }) => (
-    <div className="profile-card student">
-      <h2>Student Profile</h2>
-      <div className="profile-details">
-        <p><strong>Student ID:</strong> {data.studentID || 'N/A'}</p>
-        <p><strong>Name:</strong> {data.name}</p>
-        <p><strong>Email:</strong> {data.email}</p>
-        <p><strong>Date of Birth:</strong> {data.dob}</p>
-        <p><strong>Phone Number:</strong> {data.phoneNumber}</p>
-        <p><strong>Year of Study:</strong> {data.yearOfStudy || 'N/A'}</p>
-        <p><strong>Section:</strong> {data.section || 'N/A'}</p>
-        <p><strong>Preferred Electives:</strong> {data.preferredElectives ? data.preferredElectives.join(', ') : 'None'}</p>
-        <p><strong>Allotted Elective:</strong> {data.allottedElective || 'None'}</p>
-        <p><strong>Status:</strong> {data.status || 'N/A'}</p>
-      </div>
-    </div>
-  );
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-  // 🔹 Faculty Profile Component
-  const FacultyProfile = ({ data }) => (
-    <div className="profile-card faculty">
-      <h2>Faculty Profile</h2>
-      <div className="profile-details">
-        <p><strong>Faculty ID:</strong> {data.facultyID || 'N/A'}</p>
-        <p><strong>Name:</strong> {data.name}</p>
-        <p><strong>Email:</strong> {data.email}</p>
-        <p><strong>Date of Birth:</strong> {data.dob}</p>
-        <p><strong>Phone Number:</strong> {data.phoneNumber}</p>
-        <p><strong>Department:</strong> {data.department}</p>
-        <p><strong>Allocated Elective Class:</strong> {data.allocatedElectiveClass ? data.allocatedElectiveClass.join(', ') : 'None'}</p>
-      </div>
-    </div>
-  );
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`http://localhost:5000/api/change-user-details?name=${name}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...formData }),
+      });
 
-  // 🔹 Admin Profile Component
-  const AdminProfile = ({ data }) => (
-    <div className="profile-card admin">
-      <h2>Admin Profile</h2>
-      <div className="profile-details">
-        <p><strong>Admin ID:</strong> {data.adminID || 'N/A'}</p>
-        <p><strong>Name:</strong> {data.name}</p>
-        <p><strong>Email:</strong> {data.email}</p>
-        <p><strong>Date of Birth:</strong> {data.dob}</p>
-      </div>
-    </div>
-  );
+      if (!response.ok) throw new Error("Failed to update profile.");
 
-  // 🔹 Loading and Error Handling
-  if (loading) {
-    return <div className="loading">Loading profile...</div>;
-  }
+      alert("Profile updated successfully!");
+      setUserData(formData);
+      setEditMode(false);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("An error occurred while updating profile.");
+    }
+  };
 
-  if (error) {
-    return <div className="error">{error}</div>;
-  }
-
-  if (!userData) {
-    return <div className="no-data">No profile data available</div>;
-  }
+  if (loading) return <div className="loading">Loading profile...</div>;
+  if (error) return <div className="error">{error}</div>;
+  if (!userData) return <div className="no-data">No profile data available</div>;
 
   return (
-    <div className="profile-container">
-      {role === 'student' && <StudentProfile data={userData} />}
-      {role === 'faculty' && <FacultyProfile data={userData} />}
-      {role === 'admin' && <AdminProfile data={userData} />}
-    </div>
+    <>
+      <Navbar />
+      <div className="profile-container">
+        <h2>{role.charAt(0).toUpperCase() + role.slice(1)} Profile</h2>
+
+        {!editMode ? (
+          <div className="profile-details">
+            <p><strong>Name:</strong> {userData.name}</p>
+            <p><strong>Email:</strong> {userData.email}</p>
+            <p><strong>Date of Birth:</strong> {userData.dob}</p>
+            <p><strong>Phone Number:</strong> {userData.phoneNumber}</p>
+
+            {role === "student" && (
+              <>
+                <p><strong>Year of Study:</strong> {userData.yearOfStudy || "N/A"}</p>
+                <p><strong>Section:</strong> {userData.section || "N/A"}</p>
+                <p><strong>Preferred Electives:</strong> {userData.preferredElectives?.join(", ") || "None"}</p>
+                <p><strong>Allotted Elective:</strong> {userData.allottedElective || "None"}</p>
+                <p><strong>Status:</strong> {userData.status || "N/A"}</p>
+              </>
+            )}
+
+            {role === "faculty" && (
+              <>
+                <p><strong>Department:</strong> {userData.department}</p>
+                <p><strong>Allocated Elective Class:</strong> {userData.allocatedElectiveClass?.join(", ") || "None"}</p>
+              </>
+            )}
+
+            <button onClick={() => setEditMode(true)} className="edit-btn">Edit Profile</button>
+          </div>
+        ) : (
+          <form className="profile-form" onSubmit={handleSubmit}>
+            <label>Name:</label>
+            <input type="text" name="name" value={formData.name} onChange={handleChange} />
+
+            <label>Email:</label>
+            <input type="email" name="email" value={formData.email} onChange={handleChange} disabled />
+
+            <label>Date of Birth:</label>
+            <input type="date" name="dob" value={formData.dob} onChange={handleChange} />
+
+            <label>Phone Number:</label>
+            <input type="text" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} />
+
+            {role === "student" && (
+              <>
+                <label>Year of Study:</label>
+                <input type="text" name="yearOfStudy" value={formData.yearOfStudy || ""} onChange={handleChange} />
+
+                <label>Section:</label>
+                <input type="text" name="section" value={formData.section || ""} onChange={handleChange} />
+              </>
+            )}
+
+            {role === "faculty" && (
+              <>
+                <label>Department:</label>
+                <input type="text" name="department" value={formData.department} onChange={handleChange} />
+              </>
+            )}
+
+            <div className="form-buttons">
+              <button type="submit" className="save-btn">Save Changes</button>
+              <button type="button" className="cancel-btn" onClick={() => setEditMode(false)}>Cancel</button>
+            </div>
+          </form>
+        )}
+      </div>
+    </>
   );
 };
 

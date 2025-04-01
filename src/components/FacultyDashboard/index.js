@@ -1,67 +1,109 @@
-import React, { useEffect, useState } from 'react';
-import Calendar from 'react-calendar'; // Import the Calendar component
-import './index.css'; // Import CSS for styling
+import React, { useEffect, useState } from "react";
+import "animate.css"; // Animations
+import "./index.css"; // Custom styles
+import Cookies from "js-cookie";
+import Navbar from "../Navbar";
 
 const FacultyDashboard = () => {
-  const [schedule, setSchedule] = useState([]);
+  const [faculty, setFaculty] = useState(null);
+  const [scheduleText, setScheduleText] = useState("");
   const [electives, setElectives] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [classInfo, setClassInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const facultyID = Cookies.get("facultyID");
 
   useEffect(() => {
+    if (!facultyID) {
+      console.error("No faculty ID found in cookies.");
+      setLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       try {
-        const facultyResponse = await fetch('http://localhost:5000/api/faculty');
-        const facultyData = await facultyResponse.json();
+        const response = await fetch(
+          `http://localhost:5000/api/faculty?facultyId=${facultyID}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-        // Assuming facultyData contains schedule and electives
-        setSchedule(facultyData.schedule);
-        setElectives(facultyData.electives);
+        if (!response.ok) {
+          throw new Error("Failed to fetch faculty data");
+        }
+
+        const data = await response.json();
+
+        // Combine schedule into a single text
+        let combinedSchedule = "";
+        data.schedule.forEach((item) => {
+          combinedSchedule += item;
+        });
+        console.log(data)
+        setScheduleText(combinedSchedule.trim());
+        console.log(data.electives);
+        setFaculty(data.faculty);
+        setElectives(data.electives || []);
       } catch (error) {
-        console.error('Error fetching faculty data:', error);
+        console.error("Error fetching faculty data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
-
-  const handleDateClick = (date) => {
-    const classOnDate = schedule.find(item => new Date(item.date).toDateString() === date.toDateString());
-    setClassInfo(classOnDate ? classOnDate : null);
-    setSelectedDate(date);
-  };
-
-  const tileContent = ({ date }) => {
-    const classOnDate = schedule.find(item => new Date(item.date).toDateString() === date.toDateString());
-    return classOnDate ? <div className="dot" /> : null; // Render a dot if there's a class
-  };
+  }, [facultyID]);
 
   return (
-    <div className="faculty-dashboard">
-      <h2>Faculty Dashboard</h2>
-      <div className="calendar">
-        <Calendar
-          onClickDay={handleDateClick}
-          tileContent={tileContent}
-        />
+    <>
+      <Navbar />
+      <div className="faculty-dashboard container-fluid py-5">
+        <h2 className="text-center mb-4 animate__animated animate__fadeInDown">
+          Faculty Dashboard
+        </h2>
+
+        {loading ? (
+          <div className="text-center">
+            <div className="spinner-border text-primary" role="status"></div>
+            <p>Loading...</p>
+          </div>
+        ) : (
+          <>
+            {/* Faculty Details */}
+            {faculty ? (
+              <div className="faculty-details card shadow-sm p-3 mb-4">
+                <h3>Welcome, {faculty.name}</h3>
+                <p>
+                  <strong>Email:</strong> {faculty.email}
+                </p>
+                <p>
+                  <strong>Department:</strong> {faculty.department}
+                </p>
+                <p>
+                  <strong>Phone:</strong> {faculty.phoneNumber}
+                </p>
+              </div>
+            ) : (
+              <p className="text-muted text-center">No faculty details found.</p>
+            )}
+
+            {/* Electives Section with Combined Schedule */}
+            <div className="electives mt-4">
+              <h3>Your Electives & Schedule</h3>
+              <div className="elective-box card p-3">
+                <h5>Electives</h5>
+                <pre>{electives.length > 0 ? electives[0].id : "No electives assigned"}</pre>
+                <h5 className="mt-3">Schedule</h5>
+                <pre>{scheduleText || "No schedule available"}</pre>
+              </div>
+            </div>
+          </>
+        )}
       </div>
-      {classInfo && (
-        <div className="class-info">
-          <h3>Class Information</h3>
-          <p>{classInfo.event}</p>
-          <p>Date: {classInfo.date}</p>
-          <p>Elective: {classInfo.elective}</p>
-        </div>
-      )}
-      <div className="electives">
-        <h3>Your Electives</h3>
-        <ul>
-          {electives.map((elective, index) => (
-            <li key={index}>{elective.name}</li>
-          ))}
-        </ul>
-      </div>
-    </div>
+    </>
   );
 };
 

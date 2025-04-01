@@ -1,53 +1,102 @@
+/* General container styling */
 .courses-container {
+    max-width: 900px;
+    margin: auto;
     display: flex;
     flex-direction: column;
     padding: 20px;
+    margin-top: 80px;
 }
-
-.elective-card {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin: 10px 0;
-    padding: 15px;
+/* Course Card Styling */
+.course-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
     cursor: pointer;
-    transition: transform 0.2s;
-    animation: fadeIn 0.5s ease-in-out; /* Added animation */
+    position: relative;
 }
 
-.elective-card:hover {
+.course-card:hover {
     transform: scale(1.02);
+    background: linear-gradient(135deg, #4f93e8, #1c5fa8);
+    color: white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
-.elective-details {
-    margin-top: 10px;
-    padding: 10px;
-    background-color: #e9ecef;
+/* Button for expanding/collapsing */
+.toggle-btn {
+    background: linear-gradient(135deg, #4f93e8, #1c5fa8);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    margin-top: 0.5rem;
     border-radius: 5px;
-    animation: slideDown 0.5s ease-in-out; /* Added animation */
+    cursor: pointer;
+    transition: background 0.3s ease-in-out, transform 0.2s;
 }
 
-.feedback-carousel {
+.toggle-btn:hover {
+    background: #003f7f;
+    transform: scale(1.05);
+}
+
+/* Course Details Styling with Smooth Expand/Collapse */
+.course-details {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 0 1rem;
+    margin-top: 10px;
+    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+.course-card:hover .course-details{
+    background: linear-gradient(135deg, #4f93e8, #1c5fa8);
+    transition: background 0.3s ease-in-out, transform 0.2s;
+}
+.course-details.expanded {
+    max-height: 500px; /* Adjust as needed */
+    opacity: 1;
+    padding: 1rem;
+}
+
+/* Feedback Carousel */
+.carousel {
     margin-top: 10px;
 }
 
-/* Keyframes for animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+.carousel-inner {
+    background: white;
+    border-radius: 10px;
+    padding: 10px;
 }
 
-@keyframes slideDown {
-    from {
-        max-height: 0;
-        opacity: 0;
+.carousel-item p {
+    font-size: 16px;
+    font-style: italic;
+    text-align: center;
+    color: #333;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .courses-container {
+        padding: 0 15px;
     }
-    to {
-        max-height: 200px; /* Adjust as needed */
-        opacity: 1;
+
+    .course-card {
+        padding: 1rem;
+    }
+
+    .course-details {
+        padding: 0.8rem;
+    }
+
+    .toggle-btn {
+        width: 100%;
     }
 }

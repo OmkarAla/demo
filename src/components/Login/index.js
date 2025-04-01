@@ -4,6 +4,7 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { FcGoogle } from "react-icons/fc";
 import { BsGithub } from "react-icons/bs";
 import { FaFacebook } from "react-icons/fa";
+import Cookies from "js-cookie";
 import { auth } from "../../firebase";
 import { getAuth, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, FacebookAuthProvider } from "firebase/auth"; // Firebase auth import
 import Navbar from "../Navbar";
@@ -61,11 +62,18 @@ const Login = () => {
 
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem("logintoken", data.token); // 🔑 Store JWT token
-        console.log("Token stored:", data.token); // Log the token for verification
-
-        navigate("/"); // 🚀 Redirect to homepage
-      } else {
+        console.log("Success! Response data:", data);
+        console.log("Token:", data.token);
+        console.log("Faculty ID:", data.facultyID);
+      
+        localStorage.setItem("logintoken", data.token);
+        Cookies.set("facultyID", data.facultyID, { expires: 7, path: "/" });
+        Cookies.set("name", data.name, {expires: 7, path: "/"});
+      
+        console.log("Token stored successfully.");
+        navigate("/");
+      }
+       else {
         setErrorMsg(data.error || "Login failed");
       }
     } catch (error) {
